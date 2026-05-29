@@ -47,7 +47,6 @@ class LoggerHelper
                 'accion' => $accion ?? $descripcion,
             ]);
         } catch (\Exception $e) {
-            // Fail silently or log to standard Laravel log to avoid breaking the application flow
             \Log::error("Audit log failed: " . $e->getMessage());
         }
     }

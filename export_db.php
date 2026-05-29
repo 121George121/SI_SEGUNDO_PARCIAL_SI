@@ -1,10 +1,10 @@
 <?php
 // export_db.php
 
-$host = '127.0.0.1';
+$host = 'Localhost';
 $db   = 'incripcion_CUP';
 $user = 'postgres';
-$pass = 'Jorge2005'; // reemplaza con la contraseña real
+$pass = '123456'; // reemplaza con la contraseña real
 
 $backupFile = __DIR__ . '/backup_cup.sql';
 $pgDumpPath = '"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"'; // ruta correcta a pg_dump.exe
