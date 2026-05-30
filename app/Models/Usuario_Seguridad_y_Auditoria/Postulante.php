@@ -8,7 +8,7 @@ class Postulante extends Model
 {
     protected $table = 'postulante';
     protected $primaryKey = 'id_postulante';
-    public $incrementing = false; // Primary key references PERSONA
+    public $incrementing = false; 
     public $timestamps = false;
 
     protected $fillable = [
@@ -55,6 +55,7 @@ class Postulante extends Model
 
     public function grupos()
     {
-        return $this->belongsToMany(Grupo::class, 'grupo_postulante', 'id_postulante', 'id_grupo');
+        return $this->belongsToMany(Grupo::class, 'grupo_postulante', 'id_postulante', 'id_grupo')
+                    ->withPivot('estado', 'fecha_asignacion');
     }
 }

@@ -1,0 +1,141 @@
+SI_SEGUNDO_PARCIAL_SI/
+├── .editorconfig
+├── .env
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── .npmrc
+├── README.md
+├── artisan
+├── backup_cup.sql
+├── composer.json
+├── composer.lock
+├── export_db.php
+├── package-lock.json
+├── package.json
+├── phpunit.xml
+├── vite.config.js
+├── app/
+│   ├── Helpers/
+│   │   ├── LoggerHelper.php
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Controller.php
+│   │   │   ├── DashboardController.php
+│   │   │   ├── Gestion_Academica/
+│   │   │   │   ├── GruposController.php
+│   │   │   │   ├── HorarioController.php
+│   │   │   │   ├── carrerasYCuposController.php
+│   │   │   │   ├── materias.php
+│   │   │   │   ├── preferenciasDelCursoCUPController.php
+│   │   │   ├── Gestion_Financiera/
+│   │   │   ├── Inscripcion_y_Documentacion/
+│   │   │   │   ├── documentosController.php
+│   │   │   │   ├── inscripciónDelPostulante.php
+│   │   │   ├── Logistica_Recursos_y_Reportes/
+│   │   │   │   ├── aulaController.php
+│   │   │   │   ├── docenteController.php
+│   │   │   │   ├── estadoDelPostulante.php
+│   │   │   ├── Usuario_Seguridad_y_Auditoria/
+│   │   │   │   ├── autenticacionController.php
+│   │   │   │   ├── recuperacionController.php
+│   │   │   │   ├── usuariosYRolesController.php
+│   │   ├── Middleware/
+│   │   │   ├── AuditMiddleware.php
+│   ├── Models/
+│   │   ├── Post.php
+│   │   ├── Gestion_Academica/
+│   │   │   ├── AsignacionCupo.php
+│   │   │   ├── Asistencia.php
+│   │   │   ├── Carrera.php
+│   │   │   ├── CupoCarrera.php
+│   │   │   ├── Evaluacion.php
+│   │   │   ├── Gestion.php
+│   │   │   ├── Grupo.php
+│   │   │   ├── Horario.php
+│   │   │   ├── Materia.php
+│   │   │   ├── Modalidad.php
+│   │   │   ├── Nota.php
+│   │   │   ├── ResultadoAcademico.php
+│   │   │   ├── Turno.php
+│   │   ├── Gestion_Financiera/
+│   │   │   ├── Comprobante.php
+│   │   │   ├── Pago.php
+│   │   ├── Inscripcion_y_Documentación/
+│   │   │   ├── Documento.php
+│   │   │   ├── Inscripcion.php
+│   │   │   ├── InscripcionCarrera.php
+│   │   ├── Logistica_Recursos_y_Reportes/
+│   │   │   ├── Aula.php
+│   │   │   ├── Especialidad.php
+│   │   ├── Usuario_Seguridad_y_Auditoria/
+│   │   │   ├── Administrador.php
+│   │   │   ├── Bitacora.php
+│   │   │   ├── DetalleBitacora.php
+│   │   │   ├── Docente.php
+│   │   │   ├── Persona.php
+│   │   │   ├── Postulante.php
+│   │   │   ├── Rol.php
+│   │   │   ├── User.php
+│   ├── Providers/
+│   │   ├── AppServiceProvider.php
+├── config/
+│   ├── app.php
+│   ├── auth.php
+│   ├── cache.php
+│   ├── database.php
+│   ├── filesystems.php
+│   ├── logging.php
+│   ├── mail.php
+│   ├── queue.php
+│   ├── services.php
+│   ├── session.php
+├── database/
+│   ├── .gitignore
+│   ├── factories/
+│   │   ├── UserFactory.php
+│   ├── migrations/
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   ├── 2026_05_28_000000_create_cup_system_tables.php
+│   │   ├── 2026_05_28_034632_create_posts_table.php
+│   ├── seeders/
+│   │   ├── DatabaseSeeder.php
+├── public/
+│   ├── .htaccess
+│   ├── favicon.ico
+│   ├── index.php
+│   ├── robots.txt
+│   ├── imagenes/
+│   │   ├── Fondo.png
+│   │   ├── logo_FICCT.png
+├── resources/
+│   ├── css/
+│   │   ├── app.css
+│   ├── js/
+│   │   ├── app.js
+│   ├── views/
+│   │   ├── dashboard/
+│   │   │   ├── dashboard.blade.php
+│   │   ├── Gestion_Academica/
+│   │   ├── Gestion_Financiera/
+│   │   ├── Inscripcion_y_Documentacion/
+│   │   │   ├── documento.blade.php
+│   │   │   ├── inscripcion_Postulante.blade.php
+│   │   ├── layouts/
+│   │   │   ├── app.blade.php
+│   │   ├── Logistica_Recursos_y_Reportes/
+│   │   ├── Usuario_Seguridad_y_Auditoria/
+│   │   │   ├── login.blade.php
+│   │   │   ├── recuperacionDeCuenta.blade.php
+│   │   │   ├── usuario_y_Roles.blade.php
+├── routes/
+│   ├── console.php
+│   ├── web.php
+├── tests/
+│   ├── TestCase.php
+│   ├── Feature/
+│   │   ├── ExampleTest.php
+│   ├── Unit/
+│   │   ├── ExampleTest.php

@@ -9,9 +9,40 @@ use App\Models\Inscripcion_y_Documentacion\Inscripcion;
 use App\Models\Usuario_Seguridad_y_Auditoria\Bitacora;
 use App\Models\Usuario_Seguridad_y_Auditoria\DetalleBitacora;
 
+use App\Models\Inscripcion_y_Documentacion\Postulante;
+
 class InscripcionController extends Controller
 {
-    // Registrar nueva inscripción
+    
+    public function index()
+    {
+      /*  $postulantes = [];
+        try {
+            $postulantes = Postulante::with('inscripcion')->get()->map(fn($p) => [
+                'id'      => 'PST-' . str_pad($p->Id_postulante, 4, '0', STR_PAD_LEFT),
+                'nombre'  => trim(($p->nombre ?? '') . ' ' . ($p->apellido ?? '')),
+                'ci'      => $p->ci ?? $p->carnet ?? '-',
+                'correo'  => $p->correo ?? '-',
+                'estado'  => $p->inscripcion->estado ?? 'Pendiente',
+            ])->toArray();
+        } catch (\Exception $e) {
+        
+        }*/
+
+        if (empty($postulantes)) {
+            $postulantes = [
+                ['id' => 'PST-0001', 'nombre' => 'Juan Pérez López', 'ci' => '72912345', 'correo' => 'juan.perez@gmail.com', 'estado' => 'Inscrito'],
+                ['id' => 'PST-0002', 'nombre' => 'María Gómez Ramos', 'ci' => '83429182', 'correo' => 'maria.gomez@gmail.com', 'estado' => 'Pendiente'],
+                ['id' => 'PST-0003', 'nombre' => 'Carlos Soliz Paz', 'ci' => '90123987', 'correo' => 'carlos.soliz@gmail.com', 'estado' => 'En revisión'],
+                ['id' => 'PST-0004', 'nombre' => 'Ana Torrez Ortiz', 'ci' => '10293847', 'correo' => 'ana.torrez@gmail.com', 'estado' => 'Inscrito'],
+                ['id' => 'PST-0005', 'nombre' => 'Luis Fernández Roca', 'ci' => '84930219', 'correo' => 'luis.fernandez@gmail.com', 'estado' => 'Pendiente'],
+            ];
+        }
+
+        return view('Inscripcion_y_Documentacion.inscripcion_Postulante', compact('postulantes'));
+    }
+
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -19,20 +50,20 @@ class InscripcionController extends Controller
             'datos_basicos' => 'required|array',
         ]);
 
-        // Validar duplicados
+        
         $existente = Inscripcion::where('Id_postulante', $request->Id_postulante)->first();
         if($existente){
             return back()->withErrors(['inscripcion'=>'Ya existe una inscripción para este postulante']);
         }
 
-        // Generar código único
+      
         $codigo = 'INS-'.Str::upper(Str::random(6));
 
         $inscripcion = Inscripcion::create([
             'codigo_inscripcion' => $codigo,
             'estado' => 'Activo',
             'Id_postulante' => $request->Id_postulante,
-            // almacenar datos adicionales según tu tabla
+           
         ]);
 
         $this->registrarBitacora('Registrar Inscripción', 'Inscripción creada: '.$codigo);
@@ -40,7 +71,7 @@ class InscripcionController extends Controller
         return redirect()->back()->with('success','Inscripción registrada correctamente');
     }
 
-    // Modificar inscripción
+   
     public function update(Request $request, Inscripcion $inscripcion)
     {
         $request->validate([
@@ -49,7 +80,7 @@ class InscripcionController extends Controller
 
         $inscripcion->update([
             'estado' => $request->estado ?? $inscripcion->estado,
-            // actualizar otros campos según tu modelo
+            
         ]);
 
         $this->registrarBitacora('Modificar Inscripción', 'Inscripción modificada: '.$inscripcion->codigo_inscripcion);
@@ -67,13 +98,10 @@ class InscripcionController extends Controller
         return redirect()->back()->with('success','Inscripción eliminada correctamente');
     }
 
-    // Validar datos básicos (opcional, según tabla)
-    private function validarDatos(array $datos)
-    {
-        // Aquí podrías implementar validaciones extra
-    }
+   
+  
 
-    // Registrar en bitácora
+  
     private function registrarBitacora(string $accion, string $descripcion)
     {
         $bitacora = Bitacora::create([

@@ -19,10 +19,18 @@ class Grupo extends Model
         'id_modalidad',
         'id_turno',
         'id_docente',
-        'id_gestion'
+        'id_gestion',
+        'id_carrera',
+        'descripcion'
     ];
 
+    public function carrera()
+    {
+        return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
+    }
+
     public function aula()
+
     {
         return $this->belongsTo(Aula::class, 'id_aula', 'id_aula');
     }

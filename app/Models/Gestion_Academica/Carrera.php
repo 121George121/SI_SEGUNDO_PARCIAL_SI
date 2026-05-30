@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Models;
+namespace App\Models\Gestion_Academica;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,11 +9,7 @@ class Carrera extends Model
     protected $primaryKey = 'id_carrera';
     public $timestamps = false;
 
-    protected $fillable = [
-        'nombre_carrera',
-        'descripcion',
-        'duracion_anios'
-    ];
+    protected $fillable = ['nombre_carrera', 'descripcion', 'duracion_anios'];
 
     public function cupos()
     {

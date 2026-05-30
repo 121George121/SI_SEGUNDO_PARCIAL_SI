@@ -9,10 +9,12 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    // Tabla y llave primaria
     protected $table = 'usuario';
     protected $primaryKey = 'id_usuario';
-    public $timestamps = false; // Using default CURRENT_DATE for fecha_creacion
+    public $timestamps = false; // Si no usas created_at / updated_at
 
+    // Columnas que se pueden llenar masivamente
     protected $fillable = [
         'nombre_usuario',
         'correo',
@@ -20,30 +22,24 @@ class User extends Authenticatable
         'estado',
         'fecha_creacion',
         'id_rol',
-        'id_persona'
+        'id_persona',
+        'intentos_fallidos',
+        'bloqueado_hasta',
+        'ultimo_login'
     ];
 
+    // Columnas ocultas
     protected $hidden = [
         'contraseña',
     ];
 
-    // Map Laravel password verification to our custom 'contraseña' field
+    // Laravel usa getAuthPassword para Hash::check
     public function getAuthPassword()
     {
         return $this->contraseña;
     }
 
-    public function getAuthPasswordName()
-    {
-        return 'contraseña';
-    }
-
-    public function getEmailAttribute()
-    {
-        return $this->correo;
-    }
-
-    // Relationships
+    // Relaciones con otras tablas
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
@@ -54,6 +50,7 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
+    // Funciones de rol
     public function isSuperAdmin()
     {
         return $this->rol && $this->rol->nombre_rol === 'SuperAdministrador';

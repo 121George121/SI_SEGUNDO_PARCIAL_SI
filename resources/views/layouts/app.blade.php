@@ -173,6 +173,11 @@
                                 <i class="fa-solid fa-table-list text-xs w-5"></i>
                                 <span>Lista de Postulantes</span>
                             </a>
+                            <a href="{{ route('admin.estado_postulante') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->routeIs('admin.estado_postulante') ? 'bg-white/10 text-white shadow-sm' : 'text-blue-100 hover:bg-blue-900/20 hover:text-white' }}">
+                                <i class="fa-solid fa-user-check text-xs w-5"></i>
+                                <span>Estado del Postulante</span>
+                            </a>
+
                             
                             @if(request()->routeIs('admin.inscripciones.detail') || request()->routeIs('admin.inscripciones.update') || request()->routeIs('admin.inscripciones.validate'))
                                 <a href="{{ route('admin.inscripciones.detail', request()->route('id')) }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-white/10 text-white shadow-sm">
@@ -204,7 +209,7 @@
                         </div>
                     </div>
                     
-                    <div class="pt-4 pb-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest px-4">Seguridad y Control</div>
+                    <div class="pt-4 pb-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest px-4">Administración</div>
                     
                     <a href="{{ route('admin.usuarios') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.usuarios') ? $activeClass : $inactiveClass }}">
                         <i class="fa-solid fa-users text-lg w-6"></i>
@@ -214,6 +219,38 @@
                         <i class="fa-solid fa-folder-tree text-lg w-6"></i>
                         <span>Gestionar Documentos</span>
                     </a>
+                    <a href="{{ route('admin.carreras') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.carreras') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-hotel text-lg w-6"></i>
+                        <span>Carreras</span>
+                    </a>
+                    <a href="{{ route('admin.aulas') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.aulas') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-school text-lg w-6"></i>
+                        <span>Aulas</span>
+                    </a>
+                    <a href="{{ route('admin.materias') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.materias') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-book-open text-lg w-6"></i>
+                        <span>Materias</span>
+                    </a>
+                    <a href="{{ route('admin.grupos') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.grupos') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-people-group text-lg w-6"></i>
+                        <span>Grupos</span>
+                    </a>
+                    <a href="{{ route('admin.cupos') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.cupos') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-circle-check text-lg w-6"></i>
+                        <span>Asignación de Cupos</span>
+                    </a>
+
+                    <div class="pt-4 pb-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest px-4">Procesamiento</div>
+                    <a href="{{ route('admin.documentos') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.documentos') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-file-signature text-lg w-6"></i>
+                        <span>Validar Documentos</span>
+                    </a>
+                    <a href="{{ route('admin.pagos') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.pagos') ? $activeClass : $inactiveClass }}">
+                        <i class="fa-solid fa-credit-card text-lg w-6"></i>
+                        <span>Validar Pagos</span>
+                    </a>
+
+                    <div class="pt-4 pb-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest px-4">Seguridad y Auditoría</div>
                     <a href="{{ route('admin.bitacora') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.bitacora') ? $activeClass : $inactiveClass }}">
                         <i class="fa-solid fa-shield-halved text-lg w-6"></i>
                         <span>Bitácora de Auditoría</span>
@@ -221,10 +258,6 @@
                     <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ $inactiveClass }}">
                         <i class="fa-solid fa-gears text-lg w-6"></i>
                         <span>Configuración del Sistema</span>
-                    </a>
-                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ $inactiveClass }}">
-                        <i class="fa-solid fa-file-invoice text-lg w-6"></i>
-                        <span>Reportes Globales</span>
                     </a>
                     <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 {{ $inactiveClass }}">
                         <i class="fa-solid fa-database text-lg w-6"></i>
@@ -312,6 +345,11 @@
                                 <i class="fa-solid fa-table-list text-xs w-5"></i>
                                 <span>Lista de Postulantes</span>
                             </a>
+                            <a href="{{ route('admin.estado_postulante') }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 {{ request()->routeIs('admin.estado_postulante') ? 'bg-white/10 text-white shadow-sm' : 'text-blue-100 hover:bg-blue-900/20 hover:text-white' }}">
+                                <i class="fa-solid fa-user-check text-xs w-5"></i>
+                                <span>Estado del Postulante</span>
+                            </a>
+
                             
                             @if(request()->routeIs('admin.inscripciones.detail') || request()->routeIs('admin.inscripciones.update') || request()->routeIs('admin.inscripciones.validate'))
                                 <a href="{{ route('admin.inscripciones.detail', request()->route('id')) }}" class="flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 bg-white/10 text-white shadow-sm">
