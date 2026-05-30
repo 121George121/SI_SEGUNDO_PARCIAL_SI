@@ -9,6 +9,39 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
+    /* Ocultar el menú lateral global y hacer que el contenido ocupe el 100% */
+    .sidebar, .sidebar-overlay {
+        display: none !important;
+    }
+    .main-content, .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    .menu-toggle, .menu-btn {
+        display: none !important;
+    }
+    .back-dashboard-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        margin-right: 12px;
+    }
+    .back-dashboard-btn:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+        transform: translateX(-2px);
+    }
+    .back-dashboard-btn i {
+        font-size: 16px;
+    }
     :root {
         --bg-main: #f8fafc;
         --sidebar-bg: #07153a;
@@ -628,7 +661,7 @@
             </a>
 
             <div class="sidebar-section-title">Gestión Académica</div>
-            <a href="#"><i class="fa-solid fa-university"></i><span>Carreras y Cupos</span></a>
+            <a href="{{ route('admin.carreras') }}"><i class="fa-solid fa-university"></i><span>Carreras y Cupos</span></a>
             <a href="#"><i class="fa-solid fa-users-rectangle"></i><span>Grupos</span></a>
             <a href="#"><i class="fa-solid fa-door-open"></i><span>Aulas</span></a>
             <a href="#"><i class="fa-solid fa-calendar-alt"></i><span>Horario</span></a>
@@ -664,6 +697,9 @@
     <div class="main-content">
         <div class="topbar">
             <div class="topbar-left">
+                <a href="{{ route('dashboard') }}" class="back-dashboard-btn" title="Volver al Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
                 <button class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
                 <span class="page-title">Gestión de Usuarios</span>
             </div>
@@ -697,29 +733,30 @@
                     <span>Datos del Usuario</span>
                 </div>
 
-                <form id="userForm">
+                <form id="userForm" action="{{ route('usuarios.store') }}" method="POST">
+                    @csrf
                     <input type="hidden" id="userId">
 
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Nombre Completo <span class="required">*</span></label>
-                            <input type="text" id="nombreCompleto" placeholder="Ingrese el nombre completo" required>
+                            <input type="text" id="nombreCompleto" name="nombre_completo" placeholder="Ingrese el nombre completo" required>
                         </div>
 
                         <div class="form-group">
                             <label>Nombre de Usuario <span class="required">*</span></label>
-                            <input type="text" id="nombreUsuario" placeholder="Ingrese el nombre de usuario" required>
+                            <input type="text" id="nombreUsuario" name="nombre_usuario" placeholder="Ingrese el nombre de usuario" required>
                         </div>
 
                         <div class="form-group">
                             <label>Correo Electrónico <span class="required">*</span></label>
-                            <input type="email" id="correo" placeholder="Ingrese el correo electrónico" required>
+                            <input type="email" id="correo" name="correo" placeholder="Ingrese el correo electrónico" required>
                         </div>
 
                         <div class="form-group">
                             <label>Contraseña <span class="required">*</span></label>
                             <div class="password-wrapper">
-                                <input type="password" id="contrasena" placeholder="Ingrese la contraseña">
+                                <input type="password" id="contrasena" name="password" placeholder="Ingrese la contraseña" required>
                                 <i class="fa-regular fa-eye" onclick="togglePassword('contrasena', this)"></i>
                             </div>
                         </div>
@@ -727,24 +764,24 @@
                         <div class="form-group">
                             <label>Confirmar Contraseña <span class="required">*</span></label>
                             <div class="password-wrapper">
-                                <input type="password" id="confirmarContrasena" placeholder="Confirme la contraseña">
+                                <input type="password" id="confirmarContrasena" name="password_confirmation" placeholder="Confirme la contraseña" required>
                                 <i class="fa-regular fa-eye" onclick="togglePassword('confirmarContrasena', this)"></i>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>DNI <span class="required">*</span></label>
-                            <input type="text" id="dni" placeholder="Ingrese el DNI" required>
+                            <input type="text" id="dni" name="dni" placeholder="Ingrese el DNI" required>
                         </div>
 
                         <div class="form-group">
                             <label>Teléfono</label>
-                            <input type="text" id="telefono" placeholder="Ingrese el número de teléfono">
+                            <input type="text" id="telefono" name="telefono" placeholder="Ingrese el número de teléfono">
                         </div>
 
                         <div class="form-group">
                             <label>Estado <span class="required">*</span></label>
-                            <select id="estado" required>
+                            <select id="estado" name="estado" required>
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
                             </select>
@@ -760,10 +797,10 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Rol <span class="required">*</span></label>
-                                <select id="rol" required>
+                                <select id="rol" name="id_rol" required>
                                     <option value="">Seleccione un rol</option>
                                     @foreach($roles as $rol)
-                                        <option value="{{ $rol['nombre'] }}">{{ $rol['nombre'] }}</option>
+                                        <option value="{{ $rol['id'] }}">{{ $rol['nombre'] }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -816,20 +853,136 @@
     </div>
 </div>
 <script>
-    // Datos simulados de roles
-    const roles = [
-        { nombre: 'Administrador', descripcion: 'Acceso total al sistema y permisos completos.' },
-        { nombre: 'Editor', descripcion: 'Puede editar información pero no administrar usuarios.' },
-        { nombre: 'Usuario', descripcion: 'Acceso limitado solo a su información.' }
-    ];
+    // Datos reales cargados desde el backend
+    const roles = @json($roles);
+    let usuarios = @json($usuarios);
 
-    // Datos simulados de usuarios
-    let usuarios = [
-        { id:1, nombre_completo:'Juan Pérez', usuario:'juanp', correo:'juan@example.com', dni:'12345678', telefono:'76543210', estado:'Activo', rol:'Administrador' },
-        { id:2, nombre_completo:'María López', usuario:'marial', correo:'maria@example.com', dni:'87654321', telefono:'71234567', estado:'Activo', rol:'Editor' },
-        { id:3, nombre_completo:'Carlos Díaz', usuario:'carlosd', correo:'carlos@example.com', dni:'11223344', telefono:'79876543', estado:'Inactivo', rol:'Usuario' },
-        { id:4, nombre_completo:'Ana Torres', usuario:'anat', correo:'ana@example.com', dni:'55667788', telefono:'70123456', estado:'Activo', rol:'Usuario' },
-    ];
+    // Renderizar la tabla con usuarios
+    function renderTable(usersList = usuarios) {
+        const tbody = document.getElementById('usuariosTabla');
+        tbody.innerHTML = '';
+        if (usersList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No se encontraron usuarios</td></tr>';
+            return;
+        }
+        usersList.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="user-cell">
+                        <div class="user-avatar">${u.nombre_completo.substring(0, 2).toUpperCase()}</div>
+                        <div style="font-weight:700;">${u.usuario}</div>
+                    </div>
+                </td>
+                <td>${u.correo}</td>
+                <td>${u.dni}</td>
+                <td>${u.telefono || 'N/A'}</td>
+                <td><span class="badge role-badge">${u.rol}</span></td>
+                <td><span class="badge ${u.estado === 'Activo' ? 'badge-active' : 'badge-inactive'}">${u.estado}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-small" onclick="editarUsuario(${u.id})" type="button"><i class="fa-solid fa-pen-to-square"></i></button>
+                        
+                        <form action="/usuarios-roles/${u.id}" method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de eliminar este usuario?')">
+                            @csrf
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger btn-small"><i class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Toggle de visibilidad de contraseña
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Búsqueda en tiempo real
+    document.getElementById('buscarUsuario').addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        const filtered = usuarios.filter(u => 
+            u.nombre_completo.toLowerCase().includes(term) || 
+            u.usuario.toLowerCase().includes(term) || 
+            u.correo.toLowerCase().includes(term) || 
+            u.dni.toLowerCase().includes(term)
+        );
+        renderTable(filtered);
+    });
+
+    // Cargar formulario para edición
+    function editarUsuario(id) {
+        const u = usuarios.find(x => x.id == id);
+        if (!u) return;
+        
+        document.getElementById('formTitle').innerText = 'Editar Usuario';
+        document.getElementById('userForm').action = '/usuarios-roles/' + u.id;
+        
+        let methodInput = document.getElementById('userFormMethod');
+        if (!methodInput) {
+            methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.id = 'userFormMethod';
+            document.getElementById('userForm').appendChild(methodInput);
+        }
+        methodInput.value = 'PUT';
+        
+        document.getElementById('userId').value = u.id;
+        document.getElementById('nombreCompleto').value = u.nombre_completo;
+        document.getElementById('nombreUsuario').value = u.usuario;
+        document.getElementById('correo').value = u.correo;
+        document.getElementById('dni').value = u.dni;
+        document.getElementById('telefono').value = u.telefono === 'N/A' ? '' : u.telefono;
+        document.getElementById('estado').value = u.estado;
+        document.getElementById('rol').value = u.id_rol;
+        
+        document.getElementById('contrasena').required = false;
+        document.getElementById('confirmarContrasena').required = false;
+        document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-user-pen"></i> Actualizar Usuario';
+    }
+
+    // Resetear formulario
+    function limpiarFormulario() {
+        document.getElementById('formTitle').innerText = 'Nuevo Usuario';
+        document.getElementById('userForm').action = '{{ route("usuarios.store") }}';
+        
+        const methodInput = document.getElementById('userFormMethod');
+        if (methodInput) {
+            methodInput.remove();
+        }
+        
+        document.getElementById('userId').value = '';
+        document.getElementById('nombreCompleto').value = '';
+        document.getElementById('nombreUsuario').value = '';
+        document.getElementById('correo').value = '';
+        document.getElementById('contrasena').value = '';
+        document.getElementById('confirmarContrasena').value = '';
+        document.getElementById('dni').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('estado').value = 'Activo';
+        document.getElementById('rol').value = '';
+        
+        document.getElementById('contrasena').required = true;
+        document.getElementById('confirmarContrasena').required = true;
+        document.getElementById('btnGuardar').innerHTML = '<i class="fa-solid fa-user-plus"></i> Guardar Usuario';
+    }
+
+    // Inicializar la tabla
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable();
+    });
 </script>
 
 </body>

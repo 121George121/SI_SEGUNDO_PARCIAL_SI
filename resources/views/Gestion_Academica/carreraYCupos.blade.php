@@ -12,6 +12,39 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+    /* Ocultar el menú lateral global y hacer que el contenido ocupe el 100% */
+    .sidebar, .sidebar-overlay {
+        display: none !important;
+    }
+    .main-content, .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    .menu-toggle, .menu-btn {
+        display: none !important;
+    }
+    .back-dashboard-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        margin-right: 12px;
+    }
+    .back-dashboard-btn:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+        transform: translateX(-2px);
+    }
+    .back-dashboard-btn i {
+        font-size: 16px;
+    }
     :root {
         --bg-main: #f8fafc;
         --sidebar-bg: #07153a;
@@ -861,13 +894,13 @@
         </div>
 
         <div class="sidebar-menu">
-            <a href="{{ route('dashboard') }}" class="active">
+            <a href="{{ route('dashboard') }}">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Dashboard</span>
             </a>
 
             <div class="sidebar-section-title">Gestión Académica</div>
-            <a href="#">
+            <a href="{{ route('admin.carreras') }}" class="active">
                 <i class="fa-solid fa-university"></i>
                 <span>Carreras y Cupos</span>
             </a>
@@ -950,6 +983,9 @@
         <!-- Top Bar -->
         <div class="topbar">
             <div class="topbar-left">
+                <a href="{{ route('dashboard') }}" class="back-dashboard-btn" title="Volver al Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
                 <!-- Hamburger: toggles sidebar on mobile -->
                 <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
                     <i class="fa-solid fa-bars"></i>
@@ -1039,38 +1075,51 @@
                 </div>
             </div>
 
-           <!-- Formulario y tabla lado derecho -->
+            <!-- Formulario y tabla lado derecho -->
     <div class="main-content">
-        <h2>Registrar Nueva Carrera y Asignar Cupos</h2>
-        <div class="form-section">
-            <label>Nombre de la Carrera</label>
-            <input type="text" placeholder="Ej: Ingeniería de Sistemas">
-            <label>Código de la Carrera</label>
-            <input type="text" placeholder="Ej: ING-SIS">
-            <label>Facultad</label>
-            <select>
-                <option>Seleccione una facultad</option>
-                <option>Ingeniería</option>
-                <option>Ciencias Empresariales</option>
-                <option>Derecho</option>
-            </select>
-            <label>Modalidad</label>
-            <select>
-                <option>Seleccione una modalidad</option>
-                <option>Presencial</option>
-                <option>Virtual</option>
-            </select>
-            <label>Duración (años)</label>
-            <input type="number" placeholder="Ej: 5">
-            <label>Cupos Disponibles</label>
-            <input type="number" placeholder="Ej: 60">
-            <label>Descripción (Opcional)</label>
-            <textarea placeholder="Descripción breve de la carrera"></textarea>
-            <div class="form-buttons">
-                <button class="btn btn-cancel">Cancelar</button>
-                <button class="btn btn-save">Guardar Carrera y Cupos</button>
+        <h2 id="formTitle">Registrar Nueva Carrera y Asignar Cupos</h2>
+        <form id="carreraForm" action="{{ route('carreras.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="_method" id="formMethod" value="POST">
+            <input type="hidden" name="id_carrera" id="carreraId" value="">
+            
+            <div class="form-section" style="background:#fff; padding:24px; border-radius:16px; border:1px solid #f1f5f9; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom:24px; display:flex; flex-direction:column; gap:16px;">
+                <div>
+                    <label style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; display:block;">Nombre de la Carrera <span style="color:red;">*</span></label>
+                    <input type="text" name="nombre_carrera" id="nombreCarrera" placeholder="Ej: Ingeniería de Sistemas" style="width:100%; height:46px; border:1px solid #dbe2ea; border-radius:10px; padding:0 14px; font-family:'Outfit',sans-serif; outline:none;" required>
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <label style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; display:block;">Duración (años) <span style="color:red;">*</span></label>
+                        <input type="number" name="duracion_anios" id="duracionAnios" placeholder="Ej: 5" style="width:100%; height:46px; border:1px solid #dbe2ea; border-radius:10px; padding:0 14px; font-family:'Outfit',sans-serif; outline:none;" required min="1">
+                    </div>
+                    <div>
+                        <label style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; display:block;">Cupos Disponibles <span style="color:red;">*</span></label>
+                        <input type="number" name="cantidad_cupos" id="cantidadCupos" placeholder="Ej: 60" style="width:100%; height:46px; border:1px solid #dbe2ea; border-radius:10px; padding:0 14px; font-family:'Outfit',sans-serif; outline:none;" required min="1">
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; display:block;">Gestión Académica <span style="color:red;">*</span></label>
+                    <select name="id_gestion" id="idGestion" style="width:100%; height:46px; border:1px solid #dbe2ea; border-radius:10px; padding:0 14px; font-family:'Outfit',sans-serif; outline:none; background:#fff;" required>
+                        @foreach($gestiones as $g)
+                            <option value="{{ $g->id_gestion }}">{{ $g->anio }} - Periodo {{ $g->periodo }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; display:block;">Descripción (Opcional)</label>
+                    <textarea name="descripcion" id="descripcionCarrera" placeholder="Descripción breve de la carrera" style="width:100%; height:100px; border:1px solid #dbe2ea; border-radius:10px; padding:12px 14px; font-family:'Outfit',sans-serif; outline:none; resize:none;"></textarea>
+                </div>
+                
+                <div class="form-buttons" style="display:flex; justify-content:flex-end; gap:12px;">
+                    <button type="button" class="btn btn-cancel" onclick="clearCarreraForm()" style="height:44px; padding:0 20px; border-radius:10px; font-weight:800; font-family:'Outfit',sans-serif; background:#fff; border:1px solid #dbe2ea; color:#0f172a; cursor:pointer;">Cancelar</button>
+                    <button type="submit" class="btn btn-save" id="btnGuardarCarrera" style="height:44px; padding:0 20px; border-radius:10px; font-weight:800; font-family:'Outfit',sans-serif; background:#1e40af; border:none; color:#fff; cursor:pointer;">Guardar Carrera y Cupos</button>
+                </div>
             </div>
-        </div>
+        </form>
 
         <h2>Lista de Carreras y Cupos Disponibles</h2>
         <table>
@@ -1079,20 +1128,43 @@
                     <th>#</th>
                     <th>Nombre de la Carrera</th>
                     <th>Código</th>
-                    <th>Facultad</th>
-                    <th>Modalidad</th>
                     <th>Duración</th>
-                    <th>Cupos Disponibles</th>
+                    <th>Cupos</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td>1</td><td>Ingeniería de Sistemas</td><td>ING-SIS</td><td>Ingeniería</td><td>Presencial</td><td>5 años</td><td>60</td><td><span class="badge badge-active">Activa</span></td><td class="action-icons"><i class="fa-solid fa-pen-to-square"></i><i class="fa-solid fa-trash delete"></i></td></tr>
-                <tr><td>2</td><td>Ingenieria Informatica</td><td>CON-01</td><td>Ciencias Empresariales</td><td>Presencial</td><td>5 años</td><td>50</td><td><span class="badge badge-active">Activa</span></td><td class="action-icons"><i class="fa-solid fa-pen-to-square"></i><i class="fa-solid fa-trash delete"></i></td></tr>
-                <tr><td>3</td><td>Ingenieria Robotica</td><td>ADM-01</td><td>Ciencias Empresariales</td><td>Presencial</td><td>4 años</td><td>45</td><td><span class="badge badge-active">Activa</span></td><td class="action-icons"><i class="fa-solid fa-pen-to-square"></i><i class="fa-solid fa-trash delete"></i></td></tr>
-                <tr><td>4</td><td>Ingenieria en Redes y Telecomunicaciones</td><td>DER-01</td><td>Derecho y Ciencia Política</td><td>Presencial</td><td>5 años</td><td>40</td><td><span class="badge badge-active">Activa</span></td><td class="action-icons"><i class="fa-solid fa-pen-to-square"></i><i class="fa-solid fa-trash delete"></i></td></tr>
-            
+                @foreach($carreras as $index => $carrera)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td><strong>{{ $carrera->nombre_carrera }}</strong><br><small style="color:#64748b;">{{ $carrera->descripcion }}</small></td>
+                    <td>CAR-{{ str_pad($carrera->Id_carrera, 3, '0', STR_PAD_LEFT) }}</td>
+                    <td>{{ $carrera->duracion_anios }} años</td>
+                    <td>
+                        @php
+                            $cupoActivo = $carrera->cupos->first();
+                        @endphp
+                        <span style="font-weight:700; color:#1e40af;">{{ $cupoActivo ? $cupoActivo->cantidad_cupos : 0 }}</span>
+                    </td>
+                    <td>
+                        <span class="badge {{ ($carrera->estado ?? 'Activo') === 'Activo' ? 'badge-active' : 'badge-inactive' }}">
+                            {{ $carrera->estado ?? 'Activo' }}
+                        </span>
+                    </td>
+                    <td class="action-icons">
+                        <i class="fa-solid fa-pen-to-square" style="cursor:pointer; color:#1e40af; margin-right:12px;" onclick="editCarrera({{ $carrera->Id_carrera }}, '{{ $carrera->nombre_carrera }}', '{{ $carrera->descripcion }}', {{ $carrera->duracion_anios }}, {{ $cupoActivo ? $cupoActivo->cantidad_cupos : 0 }}, {{ $cupoActivo ? $cupoActivo->id_gestion : 'null' }})"></i>
+                        
+                        <form action="{{ route('carreras.destroy', $carrera->Id_carrera) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Está seguro de deshabilitar esta carrera?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="background:none; border:none; padding:0; cursor:pointer; color:#e31c3d;">
+                                <i class="fa-solid fa-trash delete"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -1236,6 +1308,34 @@
             closeSidebar();
         }
     });
+
+    /* ── Edit and Clear Carrera Form ── */
+    function editCarrera(id, nombre, descripcion, duracion, cupos, idGestion) {
+        document.getElementById('formTitle').innerText = 'Editar Carrera y Cupos';
+        document.getElementById('carreraForm').action = '/carreras/' + id;
+        document.getElementById('formMethod').value = 'PUT';
+        document.getElementById('carreraId').value = id;
+        document.getElementById('nombreCarrera').value = nombre;
+        document.getElementById('duracionAnios').value = duracion;
+        document.getElementById('cantidadCupos').value = cupos;
+        if (idGestion) {
+            document.getElementById('idGestion').value = idGestion;
+        }
+        document.getElementById('descripcionCarrera').value = descripcion;
+        document.getElementById('btnGuardarCarrera').innerText = 'Actualizar Carrera y Cupos';
+    }
+
+    function clearCarreraForm() {
+        document.getElementById('formTitle').innerText = 'Registrar Nueva Carrera y Asignar Cupos';
+        document.getElementById('carreraForm').action = '{{ route("carreras.store") }}';
+        document.getElementById('formMethod').value = 'POST';
+        document.getElementById('carreraId').value = '';
+        document.getElementById('nombreCarrera').value = '';
+        document.getElementById('duracionAnios').value = '';
+        document.getElementById('cantidadCupos').value = '';
+        document.getElementById('descripcionCarrera').value = '';
+        document.getElementById('btnGuardarCarrera').innerText = 'Guardar Carrera y Cupos';
+    }
 </script>
 </body>
 </html>

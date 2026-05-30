@@ -9,6 +9,39 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <style>
+    /* Ocultar el menú lateral global y hacer que el contenido ocupe el 100% */
+    .sidebar, .sidebar-overlay {
+        display: none !important;
+    }
+    .main-content, .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    .menu-toggle, .menu-btn {
+        display: none !important;
+    }
+    .back-dashboard-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: #f1f5f9;
+        color: #475569;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid #e2e8f0;
+        margin-right: 12px;
+    }
+    .back-dashboard-btn:hover {
+        background-color: #e2e8f0;
+        color: #0f172a;
+        transform: translateX(-2px);
+    }
+    .back-dashboard-btn i {
+        font-size: 16px;
+    }
     :root {
         --bg-main: #f8fafc;
         --sidebar-bg: #071426;
@@ -772,6 +805,9 @@
         <!-- TOPBAR -->
         <header class="topbar">
             <div class="topbar-left">
+                <a href="{{ route('dashboard') }}" class="back-dashboard-btn" title="Volver al Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
                 <button class="menu-toggle" id="menuToggle">
                     <i class="fa-solid fa-bars"></i>
                 </button>

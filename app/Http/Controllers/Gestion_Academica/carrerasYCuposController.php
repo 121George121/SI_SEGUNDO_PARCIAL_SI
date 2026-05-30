@@ -23,18 +23,31 @@ class CarrerasCuposController extends Controller
     public function registrarCarrera(Request $request)
     {
         $request->validate([
-            'nombre_carrera'=>'required|string|unique:CARRERA,nombre_carrera',
+            'nombre_carrera'=>'required|string|unique:carrera,nombre_carrera',
             'descripcion'=>'nullable|string',
             'duracion_anios'=>'required|integer|min:1',
+            'cantidad_cupos'=>'required|integer|min:1',
+            'id_gestion'=>'required|exists:gestion,id_gestion',
         ]);
 
         $rol = Auth::user()->rol->nombre_rol ?? '';
-        if($rol !== 'Administrador') abort(403,'No autorizado');
+        if(!in_array($rol, ['Administrador', 'SuperAdministrador', 'Admin'])) abort(403,'No autorizado');
 
         $carrera = Carrera::create([
             'nombre_carrera'=>$request->nombre_carrera,
             'descripcion'=>$request->descripcion,
             'duracion_anios'=>$request->duracion_anios,
+        ]);
+
+        $gestionObj = \App\Models\Gestion_Academica\Gestion::find($request->id_gestion);
+
+        CupoCarrera::create([
+            'id_carrera'=>$carrera->Id_carrera ?? $carrera->id_carrera,
+            'id_gestion'=>$request->id_gestion,
+            'cantidad_cupos'=>$request->cantidad_cupos,
+            'cupos_ocupados'=>0,
+            'cupos_disponibles'=>$request->cantidad_cupos,
+            'gestion'=>$gestionObj ? $gestionObj->anio : '2026',
         ]);
 
         $this->registrarBitacora('Registrar Carrera','Carrera registrada: '.$carrera->nombre_carrera);
@@ -46,25 +59,36 @@ class CarrerasCuposController extends Controller
     public function actualizarCupos(Request $request, Carrera $carrera)
     {
         $request->validate([
-            'cantidad_cupos'=>'required|integer|min:1'
+            'nombre_carrera'=>'required|string|unique:carrera,nombre_carrera,'.$carrera->Id_carrera.',id_carrera',
+            'duracion_anios'=>'required|integer|min:1',
+            'cantidad_cupos'=>'required|integer|min:1',
+            'id_gestion'=>'required|exists:gestion,id_gestion',
+            'descripcion'=>'nullable|string',
         ]);
 
         $rol = Auth::user()->rol->nombre_rol ?? '';
-        if($rol !== 'Administrador') abort(403,'No autorizado');
+        if(!in_array($rol, ['Administrador', 'SuperAdministrador', 'Admin'])) abort(403,'No autorizado');
+
+        $carrera->update([
+            'nombre_carrera'=>$request->nombre_carrera,
+            'descripcion'=>$request->descripcion,
+            'duracion_anios'=>$request->duracion_anios,
+        ]);
+
+        $gestionObj = \App\Models\Gestion_Academica\Gestion::find($request->id_gestion);
 
         $cupo = CupoCarrera::updateOrCreate(
-            ['Id_carrera'=>$carrera->Id_carrera, 'Id_gestion'=>$request->Id_gestion],
+            ['id_carrera'=>$carrera->Id_carrera ?? $carrera->id_carrera, 'id_gestion'=>$request->id_gestion],
             [
                 'cantidad_cupos'=>$request->cantidad_cupos,
-                'cupos_ocupados'=>0,
                 'cupos_disponibles'=>$request->cantidad_cupos,
-                'gestion'=>$request->gestion ?? '2026',
+                'gestion'=>$gestionObj ? $gestionObj->anio : '2026',
             ]
         );
 
         $this->registrarBitacora('Actualizar Cupos','Carrera: '.$carrera->nombre_carrera.' Cupos: '.$request->cantidad_cupos);
 
-        return redirect()->back()->with('success','Cupos actualizados correctamente');
+        return redirect()->back()->with('success','Carrera y cupos actualizados correctamente');
     }
 
     // Consultar cupos disponibles
@@ -78,7 +102,7 @@ class CarrerasCuposController extends Controller
     public function deshabilitarCarrera(Carrera $carrera)
     {
         $rol = Auth::user()->rol->nombre_rol ?? '';
-        if($rol !== 'Administrador') abort(403,'No autorizado');
+        if(!in_array($rol, ['Administrador', 'SuperAdministrador', 'Admin'])) abort(403,'No autorizado');
 
         $carrera->estado = 'Inactivo';
         $carrera->save();

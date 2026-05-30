@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+// Models
+use App\Models\Usuario_Seguridad_y_Auditoria\Postulante;
+use App\Models\Gestion_Academica\Grupo;
+use App\Models\Gestion_Academica\CupoCarrera;
 
 class DashboardController extends Controller
 {
@@ -13,67 +19,106 @@ class DashboardController extends Controller
             return redirect()->route('postulante.estado');
         }
 
-        // ------------------------------
-        // KPIs simulados
-        // ------------------------------
-        $totalPostulantes      = 120;
-        $inscripcionesActivas  = 85;
-        $pagosCompletados      = 75;
-        $gruposActivos         = 10;
+        // -------------------------------------------------------
+        // KPIs REALES desde la base de datos
+        // -------------------------------------------------------
 
-        // ------------------------------
-        // Documentos pendientes simulados
-        // ------------------------------
-        $documentosPendientes = [
-            (object)[ 'tipo_documento' => 'Certificado de Nacimiento', 'cantidad' => 3 ],
-            (object)[ 'tipo_documento' => 'Fotocopia CI',           'cantidad' => 5 ],
-            (object)[ 'tipo_documento' => 'Foto 4x4',               'cantidad' => 7 ],
-        ];
+        // Total postulantes registrados
+        $totalPostulantes = DB::table('postulante')->count();
 
-        // ------------------------------
-        // Cupos por carrera simulados
-        // ------------------------------
-        $cuposPorCarrera = [
-            (object)[
-                'nombre_carrera'    => 'Ingeniería en Sistemas',
-                'cantidad_cupos'    => 50,
-                'cupos_disponibles' => 20,
-                'cupos_ocupados'    => 30
-            ],
-            (object)[
-                'nombre_carrera'    => 'Telecomunicaciones',
-                'cantidad_cupos'    => 40,
-                'cupos_disponibles' => 15,
-                'cupos_ocupados'    => 25
-            ],
-            (object)[
-                'nombre_carrera'    => 'Ciencias de la Computación',
-                'cantidad_cupos'    => 30,
-                'cupos_disponibles' => 10,
-                'cupos_ocupados'    => 20
-            ],
-        ];
+        // Inscripciones activas (estado = 'Activo')
+        $inscripcionesActivas = DB::table('inscripcion')
+            ->where('estado', 'Activo')
+            ->count();
 
-        // ------------------------------
-        // Datos para gráfico donut (inscripciones por estado)
-        // ------------------------------
+        // Pagos completados
+        $pagosCompletados = DB::table('pago')
+            ->where('estado_pago', 'Pagado')
+            ->count();
+
+        // Grupos activos
+        $gruposActivos = DB::table('grupo')
+            ->where('estado', 'Activo')
+            ->count();
+
+        // -------------------------------------------------------
+        // Documentos pendientes agrupados por tipo
+        // -------------------------------------------------------
+        $documentosPendientes = DB::table('documento')
+            ->where('estado', 'Pendiente')
+            ->select('tipo_documento', DB::raw('COUNT(*) as cantidad'))
+            ->groupBy('tipo_documento')
+            ->orderByDesc('cantidad')
+            ->limit(5)
+            ->get();
+
+        // -------------------------------------------------------
+        // Cupos por carrera (con join a CARRERA)
+        // -------------------------------------------------------
+        $cuposPorCarrera = DB::table('cupocarrera')
+            ->join('carrera', 'cupocarrera.id_carrera', '=', 'carrera.id_carrera')
+            ->select(
+                'carrera.nombre_carrera',
+                'cupocarrera.cantidad_cupos',
+                'cupocarrera.cupos_disponibles',
+                'cupocarrera.cupos_ocupados'
+            )
+            ->orderByDesc('cupocarrera.cantidad_cupos')
+            ->get();
+
+        // -------------------------------------------------------
+        // Donut chart: Inscripciones por estado
+        // -------------------------------------------------------
+        $inscripcionPorEstado = DB::table('inscripcion')
+            ->select('estado', DB::raw('COUNT(*) as total'))
+            ->groupBy('estado')
+            ->get()
+            ->keyBy('estado');
+
+        $activos   = $inscripcionPorEstado->get('Activo')->total   ?? 0;
+        $pendiente = $inscripcionPorEstado->get('Pendiente')->total ?? 0;
+        $inactivo  = $inscripcionPorEstado->get('Inactivo')->total  ?? 0;
+        $cancelado = $inscripcionPorEstado->get('Cancelado')->total ?? 0;
+        $totalInscripciones = $activos + $pendiente + $inactivo + $cancelado;
+
+        // Documentos pendientes (total, para donut)
+        $docsCount = DB::table('documento')->where('estado', 'Pendiente')->count();
+
         $donutData = [
-            'labels' => ['Activo', 'Pendiente', 'Cancelado'],
-            'values' => [60, 25, 15],
-            'colors' => ['#1e40af', '#dc2626', '#2563eb'],
+            'labels' => ['Inscritos', 'En Proceso', 'Documentos Pendientes', 'Inactivos'],
+            'values' => [$activos, $pendiente, $docsCount, $inactivo],
+            'colors' => ['#1e40af', '#e31c3d', '#0c2c5a', '#cbd5e1'],
+            'activos'    => $activos,
+            'pendiente'  => $pendiente,
+            'docsCount'  => $docsCount,
+            'inactivo'   => $inactivo,
+            'total'      => $totalInscripciones,
         ];
 
-        // ------------------------------
-        // Datos para gráfico de línea (inscripciones por mes)
-        // ------------------------------
+        // -------------------------------------------------------
+        // Line chart: Inscripciones por mes (últimos 6 meses)
+        // -------------------------------------------------------
+        $mesesRaw = DB::table('inscripcion')
+            ->where('fecha_inscripcion', '>=', now()->subMonths(6)->startOfMonth())
+            ->select(
+                DB::raw("TO_CHAR(fecha_inscripcion, 'Mon') as mes"),
+                DB::raw("TO_CHAR(fecha_inscripcion, 'YYYY-MM') as mes_orden"),
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('mes', 'mes_orden')
+            ->orderBy('mes_orden')
+            ->get();
+
         $lineData = [
-            'labels' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-            'values' => [10, 15, 20, 25, 30, 35],
+            'labels' => $mesesRaw->pluck('mes')->toArray(),
+            'values' => $mesesRaw->pluck('total')->toArray(),
         ];
 
-        // ------------------------------
-        // Retorno a la vista con datos simulados
-        // ------------------------------
+        // If no data yet, show last 6 months with 0
+        if (empty($lineData['labels'])) {
+            $lineData = $this->emptyLineData();
+        }
+
         return view('dashboard.dashboard', compact(
             'totalPostulantes',
             'inscripcionesActivas',
@@ -85,23 +130,47 @@ class DashboardController extends Controller
             'lineData'
         ));
     }
+
+    // Generates empty line data for 6 months when there are no inscriptions yet
+    private function emptyLineData(): array
+    {
+        $labels = [];
+        $values = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $labels[] = now()->subMonths($i)->locale('es')->isoFormat('MMM');
+            $values[] = 0;
+        }
+        return ['labels' => $labels, 'values' => $values];
+    }
+
     public function usuariosRoles()
     {
-        // Roles simulados
-        $roles = [
-            ['id'=>1,'nombre'=>'Super Administrador','descripcion'=>'Acceso total al sistema'],
-            ['id'=>2,'nombre'=>'Administrador','descripcion'=>'Gestiona usuarios, inscripciones y reportes'],
-            ['id'=>3,'nombre'=>'Secretaria','descripcion'=>'Registra postulantes e inscripciones'],
-            ['id'=>4,'nombre'=>'Docente','descripcion'=>'Consulta grupos y horarios']
-        ];
+        // Roles reales desde la base de datos
+        $roles = DB::table('rol')
+            ->select('id_rol as id', 'nombre_rol as nombre', 'descripcion')
+            ->orderBy('id_rol')
+            ->get()
+            ->toArray();
 
-        // Usuarios simulados
-        $usuarios = [
-            ['id'=>1,'nombre_completo'=>'Carlos Mendoza','usuario'=>'cmendoza','correo'=>'cmendoza@cup.edu.bo','dni'=>'9856321','telefono'=>'70011223','estado'=>'Activo','rol'=>'Super Administrador'],
-            ['id'=>2,'nombre_completo'=>'María López','usuario'=>'mflopez','correo'=>'mflopez@cup.edu.bo','dni'=>'7845123','telefono'=>'72133445','estado'=>'Activo','rol'=>'Secretaria'],
-            ['id'=>3,'nombre_completo'=>'José Rojas','usuario'=>'jlrojas','correo'=>'jlrojas@cup.edu.bo','dni'=>'6654789','telefono'=>'69088776','estado'=>'Inactivo','rol'=>'Docente']
-        ];
+        // Usuarios reales con persona y rol
+        $usuarios = DB::table('usuario')
+            ->join('persona', 'usuario.id_persona', '=', 'persona.id_persona')
+            ->join('rol', 'usuario.id_rol', '=', 'rol.id_rol')
+            ->select(
+                'usuario.id_usuario as id',
+                DB::raw("CONCAT(persona.nombre, ' ', persona.apellido) as nombre_completo"),
+                'usuario.nombre_usuario as usuario',
+                'usuario.correo',
+                'persona.ci as dni',
+                'persona.telefono',
+                'usuario.estado',
+                'rol.nombre_rol as rol'
+            )
+            ->orderBy('usuario.id_usuario')
+            ->get()
+            ->map(fn($u) => (array)$u)
+            ->toArray();
 
-        return view('Usuario_Seguridad_y_Auditoria.usuario_y_Roles', compact('usuarios','roles'));
+        return view('Usuario_Seguridad_y_Auditoria.usuario_y_Roles', compact('usuarios', 'roles'));
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Usuario_Seguridad_y_Auditoria;
 
 use Illuminate\Database\Eloquent\Model;
-
 
 class Rol extends Model
 {

@@ -975,15 +975,15 @@
             <!-- Welcome Header -->
             <div class="welcome-section">
                 <div class="welcome-left">
-                    <h2>Bienvenido, Super Administrador</h2>
+                    <h2>Bienvenido, {{ Auth::user()->persona->nombre ?? 'Administrador' }}</h2>
                     <p>Sistema de Inscripción al CUP Preuniversitario</p>
                 </div>
                 
                 <div class="date-badge">
                     <i class="fa-regular fa-calendar"></i>
                     <div class="date-info">
-                        <span class="date-primary">20 de mayo de 2024</span>
-                        <span class="date-secondary">Lunes, 10:30 AM</span>
+                        <span class="date-primary">{{ now()->locale('es')->isoFormat('D [de] MMMM [de] YYYY') }}</span>
+                        <span class="date-secondary">{{ now()->locale('es')->isoFormat('dddd, h:mm A') }}</span>
                     </div>
                 </div>
             </div>
@@ -996,8 +996,8 @@
                     </div>
                     <div class="kpi-details">
                         <span class="kpi-title">Postulantes Registrados</span>
-                        <span class="kpi-value">1,248</span>
-                        <span class="kpi-trend"><i class="fa-solid fa-circle-up"></i> +12% respecto al mes anterior</span>
+                        <span class="kpi-value">{{ number_format($totalPostulantes) }}</span>
+                        <span class="kpi-trend"><i class="fa-solid fa-database"></i> Dato en tiempo real</span>
                     </div>
                 </div>
 
@@ -1007,8 +1007,8 @@
                     </div>
                     <div class="kpi-details">
                         <span class="kpi-title">Inscripciones Activas</span>
-                        <span class="kpi-value">932</span>
-                        <span class="kpi-trend"><i class="fa-solid fa-circle-up"></i> +8% respecto al mes anterior</span>
+                        <span class="kpi-value">{{ number_format($inscripcionesActivas) }}</span>
+                        <span class="kpi-trend"><i class="fa-solid fa-database"></i> Dato en tiempo real</span>
                     </div>
                 </div>
 
@@ -1018,8 +1018,8 @@
                     </div>
                     <div class="kpi-details">
                         <span class="kpi-title">Pagos Completados</span>
-                        <span class="kpi-value">785</span>
-                        <span class="kpi-trend"><i class="fa-solid fa-circle-up"></i> +15% respecto al mes anterior</span>
+                        <span class="kpi-value">{{ number_format($pagosCompletados) }}</span>
+                        <span class="kpi-trend"><i class="fa-solid fa-database"></i> Dato en tiempo real</span>
                     </div>
                 </div>
 
@@ -1028,9 +1028,9 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <div class="kpi-details">
-                        <span class="kpi-title">Grupos Asignados</span>
-                        <span class="kpi-value">56</span>
-                        <span class="kpi-trend"><i class="fa-solid fa-circle-up"></i> +4% respecto al mes anterior</span>
+                        <span class="kpi-title">Grupos Activos</span>
+                        <span class="kpi-value">{{ number_format($gruposActivos) }}</span>
+                        <span class="kpi-trend"><i class="fa-solid fa-database"></i> Dato en tiempo real</span>
                     </div>
                 </a>
             </div>
@@ -1052,31 +1052,31 @@
                                     <span class="donut-color-dot blue"></span>
                                     <span>Inscritos</span>
                                 </div>
-                                <span class="donut-label-value">932</span>
+                                <span class="donut-label-value">{{ $donutData['activos'] }}</span>
                             </div>
                             <div class="donut-label-item">
                                 <div class="donut-label-left">
                                     <span class="donut-color-dot red"></span>
                                     <span>En Proceso</span>
                                 </div>
-                                <span class="donut-label-value">518</span>
+                                <span class="donut-label-value">{{ $donutData['pendiente'] }}</span>
                             </div>
                             <div class="donut-label-item">
                                 <div class="donut-label-left">
                                     <span class="donut-color-dot dark-blue"></span>
                                     <span>Documentos Pendientes</span>
                                 </div>
-                                <span class="donut-label-value">414</span>
+                                <span class="donut-label-value">{{ $donutData['docsCount'] }}</span>
                             </div>
                             <div class="donut-label-item">
                                 <div class="donut-label-left">
                                     <span class="donut-color-dot grey"></span>
-                                    <span>Observados</span>
+                                    <span>Inactivos</span>
                                 </div>
-                                <span class="donut-label-value">198</span>
+                                <span class="donut-label-value">{{ $donutData['inactivo'] }}</span>
                             </div>
                             <div class="donut-total">
-                                Total: 2,062
+                                Total: {{ number_format($donutData['total']) }}
                             </div>
                         </div>
                     </div>
@@ -1101,28 +1101,19 @@
                         <span class="chart-card-title">Documentos Pendientes</span>
                     </div>
                     <div class="doc-list">
+                        @forelse($documentosPendientes as $doc)
                         <div class="doc-item">
-                            <span class="doc-name">DNI / Carnet de identidad</span>
-                            <span class="doc-badge">142</span>
+                            <span class="doc-name">{{ $doc->tipo_documento }}</span>
+                            <span class="doc-badge">{{ $doc->cantidad }}</span>
                         </div>
+                        @empty
                         <div class="doc-item">
-                            <span class="doc-name">Certificado de Estudios</span>
-                            <span class="doc-badge">98</span>
+                            <span class="doc-name" style="color:#94a3b8;">Sin documentos pendientes</span>
+                            <span class="doc-badge" style="background:rgba(148,163,184,0.1);color:#94a3b8;">0</span>
                         </div>
-                        <div class="doc-item">
-                            <span class="doc-name">Foto Actual</span>
-                            <span class="doc-badge">76</span>
-                        </div>
-                        <div class="doc-item">
-                            <span class="doc-name">Comprobante de Pago</span>
-                            <span class="doc-badge">58</span>
-                        </div>
-                        <div class="doc-item">
-                            <span class="doc-name">Ficha de Inscripción</span>
-                            <span class="doc-badge">40</span>
-                        </div>
+                        @endforelse
                     </div>
-                    <a href="#" class="view-all-link">Ver todos</a>
+                    <a href="{{ route('documentos.index') }}" class="view-all-link">Ver todos</a>
                 </div>
 
                 <!-- Right: Quick Access -->
@@ -1177,10 +1168,10 @@
     new Chart(donutCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Inscritos', 'En Proceso', 'Documentos Pendientes', 'Observados'],
+            labels: {!! json_encode($donutData['labels']) !!},
             datasets: [{
-                data: [45, 25, 20, 10],
-                backgroundColor: ['#1e40af', '#e31c3d', '#0c2c5a', '#cbd5e1'],
+                data: {!! json_encode($donutData['values']) !!},
+                backgroundColor: {!! json_encode($donutData['colors']) !!},
                 borderWidth: 3,
                 borderColor: '#ffffff',
                 hoverOffset: 4
@@ -1196,7 +1187,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return ` ${context.label}: ${context.raw}%`;
+                            return ` ${context.label}: ${context.raw}`;
                         }
                     }
                 }
@@ -1216,10 +1207,10 @@
     new Chart(lineCtx, {
         type: 'line',
         data: {
-            labels: ['Dic', 'Ene', 'Feb', 'Mar', 'Abr', 'May'],
+            labels: {!! json_encode($lineData['labels']) !!},
             datasets: [{
                 label: 'Inscripciones',
-                data: [150, 320, 600, 750, 650, 900],
+                data: {!! json_encode($lineData['values']) !!},
                 borderColor: '#1e40af',
                 borderWidth: 4,
                 pointBackgroundColor: '#1e40af',
@@ -1256,7 +1247,6 @@
                 },
                 y: {
                     min: 0,
-                    max: 1000,
                     ticks: {
                         stepSize: 250,
                         font: {

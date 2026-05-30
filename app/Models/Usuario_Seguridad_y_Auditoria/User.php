@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Usuario_Seguridad_y_Auditoria;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +12,7 @@ class User extends Authenticatable
     // Tabla y llave primaria
     protected $table = 'usuario';
     protected $primaryKey = 'id_usuario';
-    public $timestamps = false; // Si no usas created_at / updated_at
+    public $timestamps = false;
 
     // Columnas que se pueden llenar masivamente
     protected $fillable = [
@@ -25,7 +25,13 @@ class User extends Authenticatable
         'id_persona',
         'intentos_fallidos',
         'bloqueado_hasta',
-        'ultimo_login'
+        'ultimo_login',
+    ];
+
+    // Cast para manejar fecha de bloqueo como Carbon
+    protected $casts = [
+        'bloqueado_hasta' => 'datetime',
+        'ultimo_login'    => 'datetime',
     ];
 
     // Columnas ocultas
