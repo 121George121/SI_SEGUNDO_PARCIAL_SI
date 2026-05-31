@@ -3,8 +3,8 @@ set -e
 
 cd /var/www/html
 
-# Enlace simbólico para archivos públicos (ignorar si ya existe)
-php artisan storage:link 2>/dev/null || true
+# Enlace simbólico para archivos públicos
+php artisan storage:link --force 2>/dev/null || true
 
 # Optimizar Laravel para producción
 php artisan config:cache

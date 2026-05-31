@@ -43,14 +43,16 @@ FROM php:8.3-cli-alpine
 
 WORKDIR /var/www/html
 
-# Extensiones PHP requeridas por Laravel y MySQL (Railway)
+# Extensiones PHP requeridas por Laravel (MySQL y PostgreSQL en Railway)
 RUN apk add --no-cache \
     libzip-dev \
     oniguruma-dev \
     icu-dev \
+    postgresql-dev \
     && docker-php-ext-configure intl \
     && docker-php-ext-install \
         pdo_mysql \
+        pdo_pgsql \
         mbstring \
         zip \
         bcmath \
