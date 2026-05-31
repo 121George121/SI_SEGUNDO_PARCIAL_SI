@@ -23,12 +23,14 @@ WORKDIR /app
 
 COPY composer.json composer.lock ./
 
+# --no-autoloader: evita error porque composer.json referencia app/Models
+# antes de copiar el código fuente
 RUN composer install \
     --no-dev \
     --no-interaction \
     --prefer-dist \
-    --optimize-autoloader \
-    --no-scripts
+    --no-scripts \
+    --no-autoloader
 
 COPY . .
 
